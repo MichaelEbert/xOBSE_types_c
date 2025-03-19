@@ -1,5 +1,5 @@
 This is a translation of the xOBSE header files in to C so they can be parsed by Ghidra.
-
+Most of the datatypes are in the same header files that they are in in xOBSE.
 
 ## General Structure
 Each class has 3 structs: 

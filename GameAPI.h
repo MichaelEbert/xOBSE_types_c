@@ -43,7 +43,7 @@ struct _InterfaceManager{
 	void*			unk078;							// 078 NiAlphaProperty*
 	UInt32			unk07C;							// 07C
 	Tile			* hudReticule;					// 080
-	UInt32			unk084;							// 084
+	Tile*			unk084;							// 084
 	Tile			* altActiveTile;				// 088 appears to be active tile when activeTile is null and keyboard navigation used
 	UInt32			unk08C;							// 08C
 	UInt32			unk090;							// 090

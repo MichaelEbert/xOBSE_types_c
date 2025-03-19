@@ -132,6 +132,7 @@ struct NiTList{
 	NiTLNode* end;
 	UInt32 numItems;
 };
+ 
 /***********NiTMap***************/
 struct NiTMap_vtbl{
 	void*	CalculateBucket;
@@ -173,9 +174,14 @@ struct NiTPEntry{
 	void* data;
 };
 
-struct NiTPointerMap{
-	NiTPointerMap_vtbl* _vtbl;
+struct _NiTPointerMap
+{
 	UInt32	m_numBuckets;	// 4
 	NiTPEntry	** m_buckets;	// 8
 	UInt32	m_numItems;		// C
+};
+
+struct NiTPointerMap{
+	NiTPointerMap_vtbl* _vtbl;
+	_NiTPointerMap _data;
 };

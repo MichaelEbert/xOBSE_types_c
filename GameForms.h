@@ -15,6 +15,7 @@ struct EnchantmentItem;
 struct IngredientItem;
 struct TESFaction;
 struct TESRace;
+struct TESSpellList;
 
 enum FormType
 {
@@ -190,8 +191,8 @@ struct TESForm_vtbl
 	void * Unk_31;
 	void * Unk_32;
 	void * Unk_33; // related to activate, refr1 is activating refr, refr0 is a reference to this TESForm being activated, seen unk2 == 0
-	void * GetName;	// not sure which objects this works on, doesn't seem to work on player or random objects
-	void * GetEditorName;	// returns nothing at run-time
+	FPc * GetName;	// not sure which objects this works on, doesn't seem to work on player or random objects
+	FPc * GetEditorName;	// returns nothing at run-time
 	void * SetName; //func 0x36
 };
 
@@ -310,35 +311,6 @@ struct TESBoundObject{
 };
 
 
-/***********TESBoundObject***************/
-struct TESBoundObject_vtbl{
-	TESObject_vtbl _base;
-	void* Unk_45;
-	void* Unk_46;
-	void* Unk_47;
-};
-
-struct TESBoundObject;
-struct BoundObjectListHead
-{
-	UInt32			boundObjectCount;	// 0
-	TESBoundObject	* first;			// 4
-	TESBoundObject	* last;				// 8
-	UInt32			unkC;				// C
-};
-
-struct _TESBoundObject{
-	_TESObject _base;
-	BoundObjectListHead*	head;		// 018 / 24
-	TESBoundObject*			prev;		// 01C / 28
-	TESBoundObject*			next;		// 020 / 2C
-};
-
-
-struct TESBoundObject{
-	TESBoundObject_vtbl* _vtbl;
-	_TESBoundObject _data;
-};
 /***********TESBoundAnimObject***************/
 struct TESBoundAnimObject_vtbl{
 	TESBoundObject_vtbl _base;
@@ -492,6 +464,21 @@ struct TESAttackDamageForm{
 	_TESAttackDamageForm _data;
 };
 
+/***********TESDescription***************/
+struct TESDescription_vtbl{
+	BaseFormComponent_vtbl _base;
+	void* GetText;
+};
+
+struct _TESDescription{
+	_BaseFormComponent _base;
+	UInt32	formDiskOffset;
+};
+
+struct TESDescription{
+	TESDescription_vtbl* _vtbl;
+	_TESDescription _data;
+};
 
 /***********TESTexture***************/
 struct TESTexture_vtbl{
@@ -550,6 +537,42 @@ struct TESReactionForm{
 	_TESReactionForm _data;
 };
 
+/***********TESSpellList***************/
+struct TESSpellList_vtbl{
+	BaseFormComponent_vtbl _base;
+};
+
+struct TESSpellList_Entry;
+struct TESSpellList_Entry{
+	TESForm* type;
+	TESSpellList_Entry* next;
+};
+
+struct _TESSpellList{
+	_BaseFormComponent _base;
+	TESSpellList_Entry spellList;
+	TESSpellList_Entry leveledSpellList;
+};
+
+struct TESSpellList{
+	TESSpellList_vtbl* _vtbl;
+	_TESSpellList _data;
+};
+
+/***********TESAttributes***************/
+struct TESAttributes_vtbl{
+	BaseFormComponent_vtbl _base;
+};
+
+struct _TESAttributes{
+	_BaseFormComponent _base;
+	UInt8 attr[8];
+};
+
+struct TESAttributes{
+	TESAttributes_vtbl* _vtbl;
+	_TESAttributes _data;
+};
 
 /***********TESContainer***************/
 struct TESContainer_Data
@@ -733,8 +756,8 @@ struct TESActorBase_vtbl{
 	TESBoundAnimObject_vtbl _base;
 	void *	GetCombatStyle;
 	void * SetCombatStyle;
-	void * GetActorValue;
-	void * GetActorValue_F;
+	FU4U4 * GetActorValue;
+	FFlU4 * GetActorValue_F;
 	void * SetActorValue_F;
 	void * SetActorValue;
 	void * ModActorValue_F;
@@ -746,15 +769,15 @@ struct _TESActorBase{
 	// base classes
 	TESActorBaseData	actorBaseData;	// 024 
 	TESContainer		container;		// 044
-	//TODO fill in
-	UInt8		spellList[0x68-0x54];		// 054
-	UInt8			aiForm[0x80-0x68];			// 068
-	UInt8		health[0x88-0x80];			// 080
-	UInt8		attributes [0x94-0x88];		// 088
+	TESSpellList		spellList;		// 054
+	TESAIForm			aiForm;			// 068
+	TESHealthForm		health;			// 080
+	TESAttributes		attributes;		// 088
 	UInt8		animation[0xA0-0x94];		// 094
-	UInt8			fullName[0xAC-0xA0];		// 0A0
-	UInt8			model[0xC4-0xAC];			// 0AC
-	UInt8	scriptable[0x12];		// 0C4
+	TESFullName			fullName;		// 0A0
+	TESModel			model;			// 0AC
+	TESScriptableForm	scriptable;		// 0C4
+	UInt32 unk[5];
 };
 
 struct TESActorBase{
@@ -830,6 +853,95 @@ struct MagicItemForm{
 	_MagicItemForm _data;
 };
 
+/***********TESGlobal***************/
+struct TESGlobal_vtbl{
+	TESForm_vtbl _base;
+};
+
+enum TESGlobal_type{
+	kType_Short =	's',
+	kType_Long =	'l',
+	kType_Float =	'f'
+};
+
+struct _TESGlobal{
+	_TESForm _base;
+	BSStringT	name;		// 018
+	TESGlobal_type	type;		// 020
+	UInt8	pad21[3];	// 021
+	float	data;		// 024
+};
+
+struct TESGlobal{
+	TESGlobal_vtbl* _vtbl;
+	_TESGlobal _data;
+};
+
+/***********TESClass***************/
+struct TESClass_vtbl{
+	TESForm_vtbl _base;
+};
+
+enum TESClass_flags
+{
+	kFlag_Playable =	1 << 0,
+	kFlag_Guard =		1 << 1,
+};
+
+enum TESClass_services
+{
+	kBuySell_Weapons =		1 << 0,
+	kBuySell_Armor =		1 << 1,
+	kBuySell_Clothing =		1 << 2,
+	kBuySell_Books =		1 << 3,
+	kBuySell_Ingredients =	1 << 4,
+	kBuySell_Unk5 =			1 << 5,
+	kBuySell_Unk6 =			1 << 6,
+	kBuySell_Lights =		1 << 7,
+	kBuySell_Apparatus =	1 << 8,
+	kBuySell_Unk9 =			1 << 9,
+	kBuySell_Misc =			1 << 10,
+	kBuySell_Spells =		1 << 11,
+	kBuySell_MagicItems =	1 << 12,
+	kBuySell_Potions =		1 << 13,
+
+	kService_Training =		1 << 14,
+	kService_Unk15 =		1 << 15,
+	kService_Recharge =		1 << 16,
+	kService_Repair =		1 << 17,
+};
+
+enum TESClass_specialization{
+	eSpec_Combat = 0,
+	eSpec_Magic,
+	eSpec_Stealth,
+
+	eSpec_MAX
+};
+
+struct _TESClass{
+	_TESForm _base;
+	// child classes
+	TESFullName			fullName;			// 018
+	TESDescription		description;		// 024
+	TESTexture			texture;			// 02C
+
+	// members
+	UInt32				attributes[2];		// 038
+	TESClass_specialization				specialization;		// 040
+	UInt32				majorSkills[7];		// 044
+	TESClass_flags				classFlags;				// 060
+	TESClass_services				buySellServices;	// 064
+	UInt8				skillTrained;		// 068
+	UInt8				trainingLevel;		// 069
+	UInt8				pad6A[2];			// 06A
+};
+
+struct TESClass{
+	TESClass_vtbl* _vtbl;
+	_TESClass _data;
+};
+
 /***********TESFaction***************/
 struct TESFaction_vtbl{
 	TESForm_vtbl _base;
@@ -839,6 +951,12 @@ struct TESFaction_RankData{
 	BSStringT		maleRank;
 	BSStringT		femaleRank;
 	TESTexture	insignia;
+};
+
+enum TESFaction_Flags{
+	kFactionFlags_HiddenFromPC =	0x00000001,
+	kFactionFlags_Evil =			0x00000002,
+	kFactionFlags_SpecialCombat =	0x00000004
 };
 
 struct tList_TESFaction_RankData;
@@ -854,7 +972,7 @@ struct _TESFaction{
 	TESReactionForm	reaction;	// 024
 
 	// members
-	UInt8		factionFlags;		// 034
+	TESFaction_Flags		factionFlags;		// 034
 	UInt8		pad35[3];			// 035
 	float		crimeGoldMultiplier;// 038
 	tList_TESFaction_RankData	ranks;				// 03C
@@ -923,6 +1041,156 @@ struct _EnchantmentItem{
 struct EnchantmentItem{
 	EnchantmentItem_vtbl* _vtbl;
 	_EnchantmentItem _data;
+};
+
+/***********SpellItem***************/
+struct SpellItem_vtbl{
+	MagicItemForm_vtbl _base;
+};
+
+struct _SpellItem{
+	_MagicItemForm _base;
+	UInt32	spellType;		// 038 - init'd to FFFFFFFF
+	UInt32	magickaCost;	// 03C
+	UInt32	masteryLevel;	// 040
+	UInt32	spellFlags;		// 044
+};
+
+struct SpellItem{
+	SpellItem_vtbl* _vtbl;
+	_SpellItem _data;
+};
+
+/***********BirthSign***************/
+struct BirthSign_vtbl{
+	TESForm_vtbl _base;
+};
+
+struct _BirthSign{
+	_TESForm _base;
+	// bases
+	TESFullName		fullName;	// 018
+	TESTexture		texture;	// 024
+	TESDescription	desc;		// 030
+	TESSpellList	spellList;	// 038
+};
+
+struct BirthSign{
+	BirthSign_vtbl* _vtbl;
+	_BirthSign _data;
+};
+
+/***********TESObjectBOOK***************/
+struct TESObjectBOOK_vtbl{
+	TESBoundObject_vtbl _base;
+};
+
+struct _TESObjectBOOK{
+	_TESBoundObject _base;
+		// children
+	TESFullName			fullName;		// 024
+	TESModel			model;			// 030
+	TESIcon				icon;			// 048
+	TESScriptableForm	scriptable;		// 054
+	TESEnchantableForm	enchantable;	// 060
+	TESValueForm		value;			// 070
+	TESWeightForm		weight;			// 078
+	TESDescription		description;	// 080
+	
+	UInt8				bookFlags;		// 088
+	UInt8				teachesSkill;	// 089
+	UInt8	pad[2];	// 08A
+};
+
+struct TESObjectBOOK{
+	TESObjectBOOK_vtbl* _vtbl;
+	_TESObjectBOOK _data;
+};
+
+/***********TESObjectCONT***************/
+struct TESObjectCONT_vtbl{
+	TESBoundAnimObject_vtbl _base;
+};
+
+struct _TESObjectCONT{
+	_TESBoundAnimObject _base;
+	// child classes
+	TESContainer		container;	// 024
+	TESFullName			fullName;	// 034
+	TESModel			model;		// 040
+	TESScriptableForm	scriptable;	// 058
+	TESWeightForm		weight;		// 064
+	UInt32				unk0;		// 06C
+	TESSound*			animSounds[2];	// 070 0=open, 1=close
+	UInt8				flags078;	// 078
+	UInt8				pad[3];		// 079
+};
+
+struct TESObjectCONT{
+	TESObjectCONT_vtbl* _vtbl;
+	_TESObjectCONT _data;
+};
+
+/***********TESObjectDOOR***************/
+struct RandomTeleportEntry;
+struct RandomTeleportEntry
+{
+	TESWorldSpace*		destination; //can also be TESObjectCELL
+	RandomTeleportEntry	* next;
+};
+
+enum DoorFlags{
+	kDoorFlag_OblivionGate		= 1 << 0,
+	kDoorFlag_Automatic			= 1 << 1,
+	kDoorFlag_Hidden			= 1 << 2,
+	kDoorFlag_MinimalUse		= 1 << 3
+};
+
+struct TESObjectDOOR_vtbl{
+	TESBoundAnimObject_vtbl _base;
+};
+
+struct _TESObjectDOOR{
+	_TESBoundAnimObject _base;
+	// child classes
+	TESFullName			fullName;	// 024
+	TESModel			model;		// 030
+	TESScriptableForm	scriptable;	// 048
+	// 054 - TESMagicCasterForm
+	// 055 - TESMagicTargetForm
+	UInt32				basePad;
+
+	// members
+	TESSound*			animSounds[3];		// 058 0=open, 1=close, 2=loop
+	DoorFlags			doorFlags;			// 064
+	UInt8				pad[3];				// 065
+	RandomTeleportEntry randomTeleport;		// 068
+};
+
+struct TESObjectDOOR{
+	TESObjectDOOR_vtbl* _vtbl;
+	_TESObjectDOOR _data;
+};
+
+/***********TESObjectMISC***************/
+struct TESObjectMISC_vtbl{
+	TESBoundObject_vtbl _base;
+};
+
+struct _TESObjectMISC{
+	_TESBoundObject _base;
+	// parent classes
+	TESFullName			fullName;	// 024
+	TESModel			model;		// 030
+	TESTexture			texture;	// 048
+	TESScriptableForm	scriptable;	// 054
+	TESValueForm		value;		// 060
+	TESWeightForm		weight;		// 068
+};
+
+struct TESObjectMISC{
+	TESObjectMISC_vtbl* _vtbl;
+	_TESObjectMISC _data;
 };
 
 /***********TESAmmo***************/
@@ -995,6 +1263,20 @@ struct TESNPC{
 	_TESNPC _data;
 };
 
+/***********TESKey***************/
+struct TESKey_vtbl{
+	TESObjectMISC_vtbl _base;
+};
+
+struct _TESKey{
+	_TESObjectMISC _base;
+};
+
+struct TESKey{
+	TESKey_vtbl* _vtbl;
+	_TESKey _data;
+};
+
 /***********AlchemyItem***************/
 struct AlchemyItem_vtbl{
 	MagicItemObject_vtbl _base;
@@ -1014,6 +1296,107 @@ struct _AlchemyItem{
 struct AlchemyItem{
 	AlchemyItem_vtbl* _vtbl;
 	_AlchemyItem _data;
+};
+
+/***********TESUsesForm***************/
+struct TESUsesForm_vtbl{
+	BaseFormComponent_vtbl _base;
+};
+
+struct _TESUsesForm{
+	_BaseFormComponent _base;
+	UInt32 uses;
+};
+
+struct TESUsesForm{
+	TESUsesForm_vtbl* _vtbl;
+	_TESUsesForm _data;
+};
+
+/***********TESSigilStone***************/
+struct TESSigilStone_vtbl{
+	TESBoundObject_vtbl _base;
+};
+
+struct _TESSigilStone{
+	_TESBoundObject _base;
+	TESFullName			name;		// 024
+	TESModel			model;		// 030
+	TESIcon				icon;		// 048
+	TESScriptableForm	scriptable;	// 054
+	TESValueForm		value;		// 060
+	TESWeightForm		weight;		// 068
+	TESUsesForm			uses;		// 070
+	EffectItemList		effectList;	// 078
+};
+
+struct TESSigilStone{
+	TESSigilStone_vtbl* _vtbl;
+	_TESSigilStone _data;
+};
+
+/***********TESLevItem***************/
+struct TESLevItem_vtbl{
+	TESBoundObject_vtbl _base;
+};
+
+struct _TESLevItem{
+	_TESBoundObject _base;
+	TESLeveledList leveledList;
+};
+
+struct TESLevItem{
+	TESLevItem_vtbl* _vtbl;
+	_TESLevItem _data;
+};
+
+/***********TESRegionData***************/
+struct TESRegionData_vtbl{
+	BaseFormComponent_vtbl _base;
+};
+
+struct _TESRegionData{
+	_BaseFormComponent _base;
+	UInt8 OverrideFlag;  //1 if Override flag setted, 0 otherwise
+	UInt8 unk2;  //Always seen 0
+	UInt8 Priority;
+	UInt8 unk4;   //Spurious, seems to be 7 or 8, maybe unused?
+};
+
+struct TESRegionData{
+	TESRegionData_vtbl* _vtbl;
+	_TESRegionData _data;
+};
+
+/***********TESRegion***************/
+struct tlist_TESRegionData;
+struct tlist_TESRegionData{
+	TESRegionData* data;
+	tlist_TESRegionData* next;
+};
+
+struct TESRegionDataList {
+	tlist_TESRegionData entry;
+	UInt8 unk8;   //Always 1
+	UInt8 pad9[3];  // Zero most of the times, 13-3-0 once
+};
+
+struct TESRegion_vtbl{
+	TESForm_vtbl _base;
+};
+
+struct _TESRegion{
+	_TESForm _base;
+	TESRegionDataList* dataList;			// 018
+	tList	* areaList;				// 01C
+	TESWorldSpace	* worldSpace;	// 020
+	void		* weather;		// 024
+	float	unk028;	
+};
+
+struct TESRegion{
+	TESRegion_vtbl* _vtbl;
+	_TESRegion _data;
 };
 
 /***********TESObjectCELL***************/
@@ -1104,4 +1487,34 @@ struct _TESWorldSpace{
 struct TESWorldSpace{
 	TESWorldSpace_vtbl* _vtbl;
 	_TESWorldSpace _data;
+};
+
+/***********TESQuest***************/
+struct TESQuest_vtbl{
+	TESForm_vtbl _base;
+};
+
+struct _TESQuest{
+	_TESForm _base;
+	// base classes
+	TESScriptableForm	scriptable;	// 018
+	TESIcon				icon;		// 024
+	TESFullName			fullName;	// 030
+	
+	// members
+	UInt8		questFlags;	// 03C
+	UInt8		priority;	// 03D
+	UInt8		pad0[2];	// 03E
+	tList	stageList;	// 040
+	tList	targetList;	// 048
+	void*		unk4;		// 050
+	tList	* scriptEventList;	// 058
+	UInt8		stageIndex;	// 05C
+	UInt8		pad1[3];	// 05D
+	BSStringT		editorName;	// 060
+};
+
+struct TESQuest{
+	TESQuest_vtbl* _vtbl;
+	_TESQuest _data;
 };

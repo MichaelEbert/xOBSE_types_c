@@ -105,7 +105,7 @@ struct BSExtraData_vtbl{
 struct BSExtraData;
 struct _BSExtraData{
 	ExtraDataType		type;		// 004
-	UInt8		pad[3];		// 005
+	//UInt8		pad[3];		// 005
 	BSExtraData	* next;		// 008
 };
 

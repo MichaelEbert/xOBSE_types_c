@@ -46,6 +46,139 @@ struct ExtraContainerChanges{
 	_ExtraContainerChanges _data;
 };
 
+/***********ExtraFollower***************/
+struct ExtraFollower_vtbl{
+	BSExtraData_vtbl _base;
+	void* dtor;
+};
+
+struct tList_ExtraFollower_Entry;
+struct tList_ExtraFollower_Entry
+{
+	Character* character;
+	tList_ExtraFollower_Entry* next;
+};
+
+struct _ExtraFollower{
+	_BSExtraData _base;
+	tList_ExtraFollower_Entry* followers;
+};
+
+struct ExtraFollower{
+	ExtraFollower_vtbl* _vtbl;
+	_ExtraFollower _data;
+};
+
+/***********ExtraHealth***************/
+struct ExtraHealth_vtbl{
+	BSExtraData_vtbl _base;
+	void* dtor;
+};
+
+struct _ExtraHealth{
+	_BSExtraData _base;
+	float health;
+};
+
+struct ExtraHealth{
+	ExtraHealth_vtbl* _vtbl;
+	_ExtraHealth _data;
+};
+
+/***********ExtraUses***************/
+struct _ExtraUses{
+	_BSExtraData _base;
+	UInt32 unk0;
+};
+
+struct ExtraUses{
+	BSExtraData_vtbl* _vtbl;
+	_ExtraUses _data;
+};
+
+/***********ExtraCharge***************/
+struct _ExtraCharge{
+	_BSExtraData _base;
+	float charge;
+};
+
+struct ExtraCharge{
+	BSExtraData_vtbl* _vtbl;
+	_ExtraCharge _data;
+};
+
+/***********ExtraSoul***************/
+struct _ExtraSoul{
+	_BSExtraData _base;
+	UInt8 soul;
+	UInt8 padding[3];
+};
+
+struct ExtraSoul{
+	BSExtraData_vtbl* _vtbl;
+	_ExtraSoul _data;
+};
+
+/***********ExtraPoison***************/
+struct _ExtraPoison{
+	_BSExtraData _base;
+	AlchemyItem* poison;
+};
+
+struct ExtraPoison{
+	BSExtraData_vtbl* _vtbl;
+	_ExtraPoison _data;
+};
+
+/***********ExtraMerchantContainer***************/
+struct _ExtraMerchantContainer{
+	_BSExtraData _base;
+	TESObjectREFR* containerRef;
+};
+
+struct ExtraMerchantContainer{
+	BSExtraData_vtbl* _vtbl;
+	_ExtraMerchantContainer _data;
+};
+
+/***********ExtraLock***************/
+struct ExtraLockData
+{
+	UInt32	lockLevel;
+	TESKey	* key;
+	UInt8	flags;
+	UInt8	pad[3];
+};
+
+struct ExtraLock_vtbl{
+	BSExtraData_vtbl _base;
+};
+
+struct _ExtraLock{
+	_BSExtraData _base;
+	ExtraLockData* data;
+};
+
+struct ExtraLock{
+	ExtraLock_vtbl* _vtbl;
+	_ExtraLock _data;
+};
+
+/***********ExtraRank***************/
+struct ExtraRank_vtbl{
+	BSExtraData_vtbl _base;
+};
+
+struct _ExtraRank{
+	_BSExtraData _base;
+	UInt32 rank;
+};
+
+struct ExtraRank{
+	ExtraRank_vtbl* _vtbl;
+	_ExtraRank _data;
+};
+
 /***********ExtraOwnership***************/
 struct ExtraOwnership_vtbl{
 	BSExtraData_vtbl _base;
@@ -61,24 +194,22 @@ struct ExtraOwnership{
 	_ExtraOwnership _data;
 };
 
-/***********ExtraScript***************/
-struct ExtraScript_vtbl{
+/***********ExtraGlobal***************/
+struct ExtraGlobal_vtbl{
 	BSExtraData_vtbl _base;
 };
 
-struct _ExtraScript{
+struct _ExtraGlobal{
 	_BSExtraData _base;
-	Script* script;
-	ScriptEventList * eventList;
+	TESGlobal* globalVar;
 };
 
-struct ExtraScript{
-	ExtraScript_vtbl* _vtbl;
-	_ExtraScript _data;
+struct ExtraGlobal{
+	ExtraGlobal_vtbl* _vtbl;
+	_ExtraGlobal _data;
 };
 
-/***********ExtraOwnership***************/
-
+/***********ExtraTeleport***************/
 struct ExtraTeleport_vtbl{
 	BSExtraData_vtbl _base;
 };
@@ -102,6 +233,22 @@ struct ExtraTeleport{
 	ExtraTeleport_vtbl* _vtbl;
 	_ExtraTeleport _data;
 };
+
+/***********ExtraRandomTeleportMarker***************/
+struct ExtraRandomTeleportMarker_vtbl{
+	BSExtraData_vtbl _base;
+};
+
+struct _ExtraRandomTeleportMarker{
+	_BSExtraData _base;
+	TESObjectREFR* teleportRef;
+};
+
+struct ExtraRandomTeleportMarker{
+	ExtraRandomTeleportMarker_vtbl* _vtbl;
+	_ExtraRandomTeleportMarker _data;
+};
+
 /***********ExtraQuickKey***************/
 struct ExtraQuickKey_vtbl{
 	BSExtraData_vtbl _base;
@@ -155,7 +302,7 @@ struct ExtraPersistentCell_vtbl{
 
 struct _ExtraPersistentCell{
 	_BSExtraData _base;
-	void* cell; // TODO fix - TESObjectCELL
+	TESObjectCELL* cell;
 };
 
 struct ExtraPersistentCell{
@@ -176,6 +323,22 @@ struct _ExtraEnableStateChildren{
 struct ExtraEnableStateChildren{
 	ExtraEnableStateChildren_vtbl* _vtbl;
 	_ExtraEnableStateChildren _data;
+};
+
+/***********ExtraScript***************/
+struct ExtraScript_vtbl{
+	BSExtraData_vtbl _base;
+};
+
+struct _ExtraScript{
+	_BSExtraData _base;
+	Script* script;
+	ScriptEventList * eventList;
+};
+
+struct ExtraScript{
+	ExtraScript_vtbl* _vtbl;
+	_ExtraScript _data;
 };
 
 /***********ExtraReferencePointer***************/
@@ -208,4 +371,18 @@ struct _ExtraReferencePointer{
 struct ExtraReferencePointer{
 	ExtraReferencePointer_vtbl* _vtbl;
 	_ExtraReferencePointer _data;
+};
+
+/***********ExtraLeveledItem***************/
+struct ExtraLeveledItem_vtbl{
+	BSExtraData_vtbl _base;
+};
+
+struct _ExtraLeveledItem{
+	_BSExtraData _base;
+};
+
+struct ExtraLeveledItem{
+	ExtraLeveledItem_vtbl* _vtbl;
+	_ExtraLeveledItem _data;
 };

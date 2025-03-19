@@ -1,37 +1,5 @@
-typedef unsigned int UInt32;
-typedef signed int Int32;
-typedef signed int SInt32;
-typedef unsigned short UInt16;
-typedef unsigned char UInt8;
-
 #include "GameTypes.h"
-
-
-struct ParamInfo
-{
-	const char * typeStr;
-	UInt32		typeID;		// ParamType
-	UInt32		isOptional;	// do other bits do things?
-};
-
-/*function types*/
-/*
-start with F
-then:
-VV = void
-U4 = uint32
-U2 = uint16
-U1 = uint8
-TF = TESForm
-EL = ExtraDataList
-Pc = char*
-*/
-struct TESForm;
-
-void FVVU4(UInt32 param);
-TESForm* FTF();
-char* FPc();
-void FVVPc(char* param);
+#include "NiExtraData.h"
 
 #include "GameTiles.h"
 #include "GameMenus.h"

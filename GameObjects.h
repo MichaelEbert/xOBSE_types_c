@@ -7,29 +7,73 @@ typedef unsigned char UInt8;
 #include "GameBSExtraData.h"
 #include "GameActorValues.h"
 #include "GameProcess.h"
-//TSEObjectREFR is actually multiple inherited from TESMemContextForm
-// the baseForm at 1C is a TESMemContextForm
-// TESChildCell inherit at 18h
 
+//OBSE doesn't define this
+struct DialoguePackage;
 
-struct MagicCaster{//TODO: inheritance
-	void** _vtbl;
-	void* magicNode;
+//TODO:
+struct ActorAnimData;
+struct TESTopic;
+
+/***********MagicCaster***************/
+struct MagicCaster_vtbl{
+	void* AddAbility;
+	void* AddDisease;
+	void* AddObjectEnchantment;
+	void* 	FindTouchTarget;
+	void* 	PlayTargettedCastAnim;
+	void* 	PlayCastingAnim;
+	void* 	ApplyMagicItemCost;
+
+	// looks like returns true if can use magicItem, filling out type (and arg1 is magicka cost?)
+	FBo* IsMagicItemUsable;
+	FTR*	GetParentRefr;
+	void* GetMagicNode;	// looks up "magicnode" node in caster's NiNode
+	void*	AddEffectToSelf;
+	void*	GetSpellEffectiveness;
+	void* GetActiveMagicItem;		// calls through to MiddleHighProcess
+	void*	SetActiveMagicItem;
+	void*	GetCastingTarget;
+	void*	SetCastingTarget;
+	void*	CreateActiveMagicEffect;	// activate effect?
+};
+
+struct _MagicCaster{
+	NiNode* magicNode;
 	UInt32 state;
 };
 
-struct MagicTarget{//TODO: inheritance
-	void** _vtbl;
+struct MagicCaster{
+	MagicCaster_vtbl* _vtbl;
+	_MagicCaster _data;
+};
+
+/***********MagicTarget***************/
+struct MagicTarget_vtbl{
+	void* Destructor;
+	FTR* GetParent;
+	void* GetEffectList;
+	//TODO incomplete VTBL
+};
+
+struct _MagicTarget{
 	UInt8	unk04;		// 004
 	UInt8	pad05[3];
 };
 
-void func_additem_t(TESForm* item, ExtraDataList xDataList, UInt32 count);
+struct MagicTarget{
+	MagicTarget_vtbl* _vtbl;
+	_MagicTarget _data;
+};
+
+/***********TESObjectREFR***************/
+
+void func_additem_t(TESForm* item, ExtraDataList* xDataList, UInt32 count);
 
 struct TESObjectREFR_vtbl{
 	TESForm_vtbl _base;
 	void* Unk_37;
-	void* CanCastShadows;	// 38
+	FBo* CanCastShadows;	// 38
 	void* SetCanCastShadows;
 	void* IsProjectile;
 	void* GetScale;
@@ -66,22 +110,26 @@ struct TESObjectREFR_vtbl{
 	void* Unk_5A;
 	void* Unk_5B;
 	FTF* GetBaseForm;	// returns type this object references
-	void* GetPos;
+	F3F* GetPos;
 	void* Unk_5E;
 	void* Unk_5F;
 	void* Unk_60;	// 60
 	void* Unk_61;
 	void* Unk_62;
 	void* GetSleepState;
-	void* IsActor;
+	FBo* IsActor;
 	void* ChangeCell;
-	void* IsDead;
+	FBo* IsDead;
 	void* Unk_67;
 	void* Unk_68;
 	void* Unk_69;
 };
 
 struct NiNode;
+
+//TSEObjectREFR is actually multiple inherited from TESMemContextForm
+// the baseForm at 1C is a TESMemContextForm
+// TESChildCell inherit at 18h
 
 struct _TESObjectREFR{
 	_TESForm _base;
@@ -193,7 +241,7 @@ struct Actor_vtbl{
 	void* Unk_AE;
 	void* Unk_AF;
 	void* Unk_B0;	// B0
-	void* Unk_B1;
+	void* some_removeitem_thing;  //some_removeitem_thing
 	void* Unk_B2;
 	void* Unk_B3; // called after Activate by TESForm::Unk33()
 	void* Unk_B4;
@@ -306,10 +354,53 @@ struct Character{
 };
 
 /***********PlayerCharacter***************/
-/*
+typedef Actor_vtbl PlayerCharacter_vtbl;
+
+struct Creature;
+
+enum PlayerCharacterMiscStat
+	{
+		kMiscStat_DaysInPrison = 0,
+		kMiscStat_DaysPassed,
+		kMiscStat_SkillIncreases,
+		kMiscStat_TrainingSessions,
+		kMiscStat_LargestBounty,
+		kMiscStat_CreaturesKilled,
+		kMiscStat_PeopleKilled,
+		kMiscStat_PlacesDiscovered,
+		kMiscStat_LocksPicked,
+		kMiscStat_LockpicksBroken,
+		kMiscStat_SoulsTrapped,	// 10
+		kMiscStat_IngredientsEaten,
+		kMiscStat_PotionsMade,
+		kMiscStat_OblivionGatesShut,
+		kMiscStat_HorsesOwned,
+		kMiscStat_HousesOwned,
+		kMiscStat_StoresInvestedIn,
+		kMiscStat_BooksRead,
+		kMiscStat_SkillBooksRead,
+		kMiscStat_ArtifactsFound,
+		kMiscStat_HoursSlept,	// 20
+		kMiscStat_HoursWaited,
+		kMiscStat_DaysAsAVampire,
+		kMiscStat_LastDayAsAVampire,
+		kMiscStat_PeopleFedOn,
+		kMiscStat_JokesTold,
+		kMiscStat_DiseasesContracted,
+		kMiscStat_NirnrootsFound,
+		kMiscStat_ItemsStolen,
+		kMiscStat_ItemsPickpocketed,
+		kMiscStat_Trespasses,	// 30
+		kMiscStat_Assaults,
+		kMiscStat_Murders,
+		kMiscStat_HorsesStolen,
+
+		kMiscStat_Max			// 34
+	};
+
 struct _PlayerCharacter{
 	_Actor _base;
-		UInt32		unk104[(0x118 - 0x104) >> 2];				// 104
+	UInt32		unk104[(0x118 - 0x104) >> 2];				// 104
 	DialoguePackage	* dialoguePackage;						// 118
 	UInt32		unk11C[(0x130 - 0x11C) >> 2];				// 11C
 	float		skillExp[21];								// 130	current experience for each skill
@@ -319,8 +410,8 @@ struct _PlayerCharacter{
 	UInt8		unk1DD[3];									// 1DD
 	Creature	* lastRiddenHorse;							// 1E0
 	UInt32		unk1E4[(0x204 - 0x1E4) >> 2];				// 1E4
-	float		maxAVModifiers[kActorVal_OblivionMax];		// 204
-	float		scriptAVModifiers[kActorVal_OblivionMax];	// 324
+	float		maxAVModifiers[0x48];		// 204
+	float		scriptAVModifiers[0x48];	// 324
     float       health;                                    // 444
     float       magicka;                                   // 448
     float       stamina;                                   // 44C
@@ -348,9 +439,9 @@ struct _PlayerCharacter{
 	UInt32		unk5E0;							// 5E0
 	TESTopic	* unk5E4;						// 5E4
 	UInt32		unk5E8;							// 5E8
-	tList<QuestStageItem> knownQuestStageItems;	// 5EC
+	tList knownQuestStageItems;	// 5EC; type is <QuestStageItem>
 	TESQuest	* activeQuest;					// 5F4
-	tList<TESObjectREFR*> activeQuestTargets;	// 5F8 targets whose conditions evaluate to true, updated each frame by HUDMainMenu::Update()
+	tList activeQuestTargets;	// 5F8 targets whose conditions evaluate to true, updated each frame by HUDMainMenu::Update()
 	UInt32		unk600[(0x610 - 0x600) >> 2];	// 600
 	UInt8		unk610;							// 610
 	UInt8		isAMurderer;					// 611
@@ -363,7 +454,7 @@ struct _PlayerCharacter{
 	UInt32		unk648[(0x650 - 0x648) >> 2];	// 648
 	TESClass	* wtfClass;						// 650 - this is not the player class! use OBLIVION_CAST(this, TESForm, TESNPC)->npcClass
 	UInt32		unk654;							// 654
-	UInt32		miscStats[kMiscStat_Max];		// 658
+	PlayerCharacterMiscStat		miscStats[34];		// 658
 	AlchemyItem	* alchemyItem;					// 6E0
 	UInt8		bVampireHasFed;					// 6E4 returned by vtbl+260, set by vtbl+264
 	UInt8		isInCharGen;					// 6E5
@@ -375,8 +466,20 @@ struct _PlayerCharacter{
 	float		requiredSkillExp[21];			// 7A4 total amt of exp needed to increase each skill
 	UInt32		unk7F8;							// 7F8
 	UInt32		unk7FC;							// 7FC
-	*/
-	
+};
+
+struct PlayerCharacter{
+	PlayerCharacter_vtbl* _vtbl;
+	_PlayerCharacter _data;
+};
+
+/***********Creature***************/
+typedef Actor_vtbl Creature_vtbl;
+typedef _Actor _Creature;
+struct Creature{
+	Creature_vtbl* _vtbl;
+	_Creature _data;
+};
 /***********ArrowProjectile***************/
 struct ArrowProjectile_vtbl{
 	MobileObject_vtbl _base;

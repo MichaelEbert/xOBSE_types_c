@@ -27,6 +27,103 @@ struct Tile_vtbl{
 	void*	Unk_06;	// does something with tile's NiNode
 };
 
+enum eTileValue {
+	//...
+
+	kTileValue_visible		= 0x00000FA1,
+	kTileValue_class,
+	kTileValue_listclip,
+	kTileValue_clipwindow,
+	kTileValue_stackingtype,
+	kTileValue_locus,
+	kTileValue_alpha,
+	kTileValue_id,
+	kTileValue_disablefade,
+	kTileValue_listindex,
+	kTileValue_depth,
+	kTileValue_y,
+	kTileValue_x,
+	kTileValue_user0,
+	kTileValue_user1,
+	kTileValue_user2,
+	kTileValue_user3,
+	kTileValue_user4,
+	kTileValue_user5,
+	kTileValue_user6,
+	kTileValue_user7,
+	kTileValue_user8,
+	kTileValue_user9,
+	kTileValue_user10,
+	kTileValue_user11,
+	kTileValue_user12,
+	kTileValue_user13,
+	kTileValue_user14,
+	kTileValue_user15,
+	kTileValue_user16,
+	kTileValue_user17,
+	kTileValue_user18,
+	kTileValue_user19,
+	kTileValue_user20,
+	kTileValue_user21,
+	kTileValue_user22,
+	kTileValue_user23,
+	kTileValue_user24,
+	kTileValue_user25,
+	kTileValue_clips,
+	kTileValue_target,
+	kTileValue_height,
+	kTileValue_width,
+	kTileValue_red,
+	kTileValue_green,
+	kTileValue_blue,
+	kTileValue_tile,
+	kTileValue_childcount,
+	kTileValue_child_count	= kTileValue_childcount,
+	kTileValue_justify,
+	kTileValue_zoom,
+	kTileValue_font,
+	kTileValue_wrapwidth,
+	kTileValue_wraplimit,
+	kTileValue_wraplines,
+	kTileValue_pagenum,
+	kTileValue_ishtml,
+	kTileValue_cropoffsety,
+	kTileValue_cropy		= kTileValue_cropoffsety,
+	kTileValue_cropoffsetx,
+	kTileValue_cropx		= kTileValue_cropoffsetx,
+	kTileValue_menufade,
+	kTileValue_explorefade,
+	kTileValue_mouseover,
+	kTileValue_string,
+	kTileValue_shiftclicked,
+	kTileValue_focusinset,
+	kTileValue_clicked,
+	kTileValue_clickcountbefore,
+	kTileValue_clickcountafter,
+	kTileValue_clickedfunc,
+	kTileValue_clicksound,
+	kTileValue_filename,
+
+	//...
+
+	kTileValue_xdefault		= 0x00000FF0,
+	kTileValue_xup,
+	kTileValue_xdown,
+	kTileValue_xleft,
+	kTileValue_xright,
+	kTileValue_xscroll,
+	kTileValue_xlist,
+	kTileValue_xbuttona,
+	kTileValue_xbuttonb,
+	kTileValue_xbuttonx,
+	kTileValue_xbuttony,
+	kTileValue_xbuttonlt,
+	kTileValue_xbuttonrt,
+	kTileValue_xbuttonlb,
+	kTileValue_xbuttonrb,
+
+	//...
+};
 
 struct NiTLNode_Tile;
 struct NiTLNode_Tile{
@@ -54,7 +151,7 @@ struct TileValue{
 	BSStringT	str;			// 08
 	TileValueExpressionList	exprList;	// 10
 	UInt16	id;				// 18
-	UInt8	bIsNum;			// 1A 0 = string, 1 = number
+	bool	bIsNum;			// 1A 0 = string, 1 = number
 	UInt8	pad1B;			// 1B
 };
 
