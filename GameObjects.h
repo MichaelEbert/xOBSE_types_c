@@ -158,7 +158,7 @@ struct MobileObject_vtbl{
 	void* Unk_6B;
 	void* Unk_6C;
 	void* Move;
-	void* Jump;
+	//void* Jump; why is this commented out in xobse. where did jump go.
 	void* FallImpact;
 	void* Unk_6F;
 	void* Unk_70;
@@ -305,10 +305,14 @@ struct Actor_vtbl{
 	void* OnHealthDamage;
 };
 
-struct Actor_PowerListEntry;
+struct Actor_PowerListData {
+	SpellItem	* power;
+	float		timer;		// init'ed to (3600 / TimeScale) * 24 <- TimeScale is a TESGlobal
+};
 
+struct Actor_PowerListEntry;
 struct Actor_PowerListEntry{
-	void* data; //TODO PowerListData type
+	Actor_PowerListData* data;
 	Actor_PowerListEntry* next;
 };
 

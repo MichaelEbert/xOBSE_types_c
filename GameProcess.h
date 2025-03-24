@@ -1,5 +1,11 @@
 #include "GameTypes.h"
 
+struct ExtraContainerChangesEntryData;
+struct NiExtraData;
+struct NiObject;
+struct ActorAnimData;
+
+
 struct BaseProcess_vtbl{
 	FVV* 	Destructor;
 	FVV* 	Unk_01 ;

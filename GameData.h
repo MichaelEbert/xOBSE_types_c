@@ -3,8 +3,8 @@
 /***********ChangesMap***************/
 struct ChangesMap_vtbl{
     NiTPointerMap_vtbl _base;
-    void* unk07();
-    void* unk08();
+    void* unk07;
+    void* unk08;
 };
 
 struct _ChangesMap{
